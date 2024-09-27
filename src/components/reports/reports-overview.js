@@ -47,6 +47,14 @@ export default function ReportsOverview({ selected, filters }) {
 
   const [EstadoData, setEstadoData] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const toMoney = value => {
+    const money = Number(value);
+    if (isNaN(money)) {
+      return value;
+    }
+
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'COP' }).format(money)
+  }
   const [optionColumnChart, setOptionColumnChart] = useState({
     chart: {
       type: "bar",
@@ -296,7 +304,7 @@ export default function ReportsOverview({ selected, filters }) {
         size: 1
       },
       title: {
-        text: 'Costos ventas',
+        text: 'Evolución ingresos vs costos',
         //offsetX: 110
       },
       xaxis: {
@@ -1001,7 +1009,7 @@ plotOptions: {
     xaxis: {},
   });
 
-
+  const [chartRoaRoe, setChartRoaRoe] = useState({})
 
   const [chartCrecimiento, setChartCrecimiento] = useState({
     series: [],
@@ -1036,6 +1044,21 @@ plotOptions: {
           opacity: 0.5
         },
       },
+      responsive: [
+        {
+          breakpoint: 1000,
+          options: {
+            plotOptions: {
+              bar: {
+                horizontal: false
+              }
+            },
+            legend: {
+              position: "bottom"
+            }
+          }
+        }
+      ],
       markers: {
         size: 1
       },
@@ -1377,12 +1400,18 @@ plotOptions: {
             crecimiento_ventas2,
             textoRadiaBarUltimo,
             textoRadiaBarAnterior,
-            no_hay_data
+            no_hay_data,
+            max_saldo,
+            max_gastosVentas,
+            max_gastosAdmon,
+            max_saldoCostos,
+            roa,
+            roe,
+            labels_roaroe
           } = res.data;
 
-         
-          setEstadoData(no_hay_data);
 
+          setEstadoData(no_hay_data);
         
           setejemploChart({
             ...ejemploChart1,
@@ -1438,7 +1467,7 @@ plotOptions: {
               type: 'radialBar',
           },
           title: {
-            text: 'Crecimiento',
+            text: '',
             //offsetX: 110
           },
           labels: [textoRadiaBarUltimo],
@@ -1545,14 +1574,14 @@ plotOptions: {
             series: [{
               name: 'Ventas',
               type: 'column',
-              color:'#800080',
+              color:'#80448C',
               data: saldo,
               categories: ['2021', '2022', '2023', '2027']
 
             }, {
               name: 'Crecimiento',
               type: 'line',
-              color: '#ffdf00',
+              color: '#F7A741',
               curve: 'smooth',
               data: crecimiento,
               categories: ['2021', '2022', '2023', '2027']
@@ -1562,8 +1591,9 @@ plotOptions: {
 
           options: {
             chart: {
-              height: 350,
-              type: 'line',
+              width:500,
+              height:450,
+              type: 'bar',
               toolbar: {
                 show: false,
                 offsetX: 0,
@@ -1580,10 +1610,25 @@ plotOptions: {
                 },
             },
           },
+          responsive: [
+            {
+              breakpoint: 1000,
+              options: {
+                plotOptions: {
+                  bar: {
+                  
+                    horizontal: false
+                  }
+                },
+                legend: {
+                  position: "bottom"
+                }
+              }
+            }
+          ],
           plotOptions: {
             bar: {
             
-           
              columnWidth: "40%",
             },
           },
@@ -1602,7 +1647,7 @@ plotOptions: {
               size: 4
             },
             title: {
-              text: 'Evolución ingresos'
+              text: 'Evolución Ingresos'
             },
             dataLabels: {
               enabled: false,
@@ -1617,7 +1662,8 @@ plotOptions: {
               y: [{
                 formatter: function (y) {
                   if(typeof y !== "undefined") {
-                    return  y.toFixed(0) + "$";
+                    y=toMoney(y)
+                    return  y;
                   }
                   return y;
                   
@@ -1625,7 +1671,7 @@ plotOptions: {
               }, {
                 formatter: function (y) {
                   if(typeof y !== "undefined") {
-                    return  y.toFixed(2) + "%";
+                    return  y.toFixed(0) + "%";
                   }
                   return y;
                   
@@ -1635,6 +1681,8 @@ plotOptions: {
             },
             labels: labels,
             yaxis: [{
+              min:0,
+              max:saldo,
               labels: {
                 show: false,
               },
@@ -1658,6 +1706,190 @@ plotOptions: {
          
           
           });
+
+    
+          setChartRoaRoe({
+            ...chartRoaRoe,
+          
+            series: [{
+              name: 'Roa',
+              type: 'column',
+              color:'#80448C',
+              data: roa,
+              categories: ['2021', '2022', '2023', '2027']
+
+            }, {
+              name: 'Roe',
+              type: 'column',
+              color: '#F7A741',
+              data: roe,
+              categories: ['2021', '2022', '2023', '2027']
+
+            },
+          ],
+        options :{
+          chart: {
+            width:500,
+            height:250,
+            type: 'bar',
+            toolbar: {
+              show: false,
+              offsetX: 0,
+              offsetY: 0,
+              tools: {
+                download: true,
+                selection: true,
+                zoom: true,
+                zoomin: true,
+                zoomout: true,
+                pan: true,
+                reset: true | '<img src="/static/icons/reset.png" width="20">',
+                customIcons: []
+              },
+          },
+        },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              columnWidth: "75%",
+          
+            }
+          },
+          grid: {
+            show:false,
+            borderColor: '#e7e7e7',
+            row: {
+              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+              opacity: 0.5
+            },
+          },
+          title: {
+            text: 'ROA vs ROE',
+            //offsetX: 110
+          },
+          dataLabels: {
+            enabled: true,
+          
+          },
+          stroke: {
+          
+          },
+          tooltip: {
+            shared: false,
+            intersect: true
+          },
+          xaxis: {
+            categories: labels_roaroe,
+            labels: {
+              formatter: function(value) {
+                 return value;    
+          }
+        }
+          },
+
+       
+          }
+       /* 
+          options: {
+            chart: {
+              width:500,
+              height:450,
+              type: 'bar',
+              toolbar: {
+                show: false,
+                offsetX: 0,
+                offsetY: 0,
+                tools: {
+                  download: true,
+                  selection: true,
+                  zoom: true,
+                  zoomin: true,
+                  zoomout: true,
+                  pan: true,
+                  reset: true | '<img src="/static/icons/reset.png" width="20">',
+                  customIcons: []
+                },
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 1000,
+              options: {
+                plotOptions: {
+                  bar: {
+                  
+                    horizontal: true
+                  }
+                },
+                legend: {
+                  position: "bottom"
+                }
+              }
+            }
+          ],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+             columnWidth: "55%",
+            },
+          },
+            stroke: {
+              width: [0, 0]
+            },
+            grid: {
+              show:false,
+              borderColor: '#e7e7e7',
+              row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+              },
+            },
+            markers: {
+              size: 4
+            },
+            title: {
+              text: 'Roa vs Roe'
+            },
+            dataLabels: {
+              enabled: false,
+              enabledOnSeries: [1],
+              formatter: function(val, opt) {
+                return val+"%"
+            },
+            },
+            tooltip: {
+              shared: false,
+              intersect: true,
+              y: [{
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    y=toMoney(y)
+                    return  y;
+                  }
+                  
+                }
+              }, {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    y=toMoney(y)
+                    return  y;
+                  }
+                  
+                }
+              }]
+              
+            },
+            labels: labels,
+            yaxis: [] 
+            }
+        
+          
+          */
+         
+          
+          });
+
+
 
 
 
@@ -1699,13 +1931,13 @@ plotOptions: {
             {
               name: 'Costos ventas',
               type: 'column',
-              color:'#d38226',
+              color:'#00938b',
               data: costoV
             },
             {
               name: 'Ventas',
               type: 'column',
-              color:'#FF4500',
+              color:'#80448C',
               data: saldo
             }, 
             {
@@ -1742,9 +1974,25 @@ plotOptions: {
           dataLabels: {
             enabled: false
           },
+          responsive: [
+            {
+              breakpoint: 1000,
+              options: {
+                plotOptions: {
+                  bar: {
+                  
+                    horizontal: false
+                  }
+                },
+                legend: {
+                  position: "bottom"
+                }
+              }
+            }
+          ],
           stroke: {
             curve: 'smooth',
-            width: [1, 1, 4]
+            width: [0, 0, 4]
           },
           grid: {
             show:false,
@@ -1753,6 +2001,9 @@ plotOptions: {
               colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
               opacity: 0.5
             },
+          },
+          markers: {
+            size: 5
           },
           plotOptions: {
             bar: {
@@ -1764,7 +2015,7 @@ plotOptions: {
             size: 5
           },
           title: {
-            text: 'Costos ventas',
+            text: 'Evolución Ingresos vs Costos',
             //offsetX: 110
           },
           xaxis: {
@@ -1772,10 +2023,10 @@ plotOptions: {
           },
           yaxis: [
             {
+              
               min: 0,
-              max: 800000000,
+              max: max_saldoCostos,
               forceNiceScale: true,
-              seriesName: 'Income',
               labels: {
                 show: false,
               },
@@ -1785,33 +2036,33 @@ plotOptions: {
             },
             {
               min: 0,
-              max: 800000000,
+              max: max_saldoCostos,
               forceNiceScale: true,
-              seriesName: 'Cashflow',
               labels: {
                 show: false,
               },
-              opposite: true,
               axisTicks: {
                 show: false,
               },
             },
+
             {
-           
-              seriesName: 'Revenue',
+             
+              forceNiceScale: true,
+              opposite:true,
               labels: {
                 show: false,
               },
-              opposite: true,
-              title: {
-                text: '',
+              axisTicks: {
+                show: false,
               },
             },
+         
            
           ],
           tooltip: {
-            shared: false,
-            intersect: true,
+            shared: true,
+            intersect: false,
             fixed: {
               enabled: true,
               position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
@@ -1821,25 +2072,24 @@ plotOptions: {
             y: [{
               formatter: function (y) {
                 if(typeof y !== "undefined") {
-                  return  y.toFixed(0) + "$";
+                  y=toMoney(y)
+                  return  y;
                 }
-                return y;
                 
               }
             }, {
               formatter: function (y) {
                 if(typeof y !== "undefined") {
-                  return  y.toFixed(2) + "$";
+                  y=toMoney(y)
+                  return  y;
                 }
-                return y;
                 
               }},
               {
                 formatter: function (y) {
                   if(typeof y !== "undefined") {
-                    return  y.toFixed(4) + "%";
+                    return  y.toFixed(0) + "%";
                   }
-                  return y;
                   
                 }
             }]
@@ -1868,24 +2118,24 @@ plotOptions: {
               {
                 name: 'Gastos ventas',
                 type: 'column',
-                color:'#800080',
+                color:'#F7A741',
                 data: gastosVentas
               },
               {
                 name: 'Gastos administracion',
                 type: 'column',
-                color:'#14a072',
+                color:'#83BA43',
                 data: gastosAdmon
               },
           
               {
                 name: 'Ventas',
-                color:'#2bd326',
+                color:'#80448C',
                 type: 'column',
                 data: saldo
               },
               {
-                name: '% gastos sobre ventas',
+                name: '% Gastos sobre ventas',
                 type: 'line',
                 color:'#FF4500',
                 curve: 'smooth',
@@ -1898,7 +2148,7 @@ plotOptions: {
             series: [
           ],
             chart: {
-            height: 350,
+            height: 50,
             stacked: true,
             type: 'line',
             toolbar: {
@@ -1928,9 +2178,11 @@ plotOptions: {
             }
           }
         }],
-          dataLabels: {
-            enabled: false
-          },
+        dataLabels: {
+          formatter: (val) => {
+            return val / 1000000 + 'K'
+          }
+        },
           stroke: {
             curve: 'smooth',
             width: [1, 1, 1,4]
@@ -1943,8 +2195,8 @@ plotOptions: {
                  enabled: false,
                  offsetX: 0,
                  style: {
-                   fontSize: '13px',
-                   fontWeight: 900
+                   fontSize: '10px',
+                   fontWeight: 800
                  }
                }
              },
@@ -1960,69 +2212,70 @@ plotOptions: {
             },
           },
           markers: {
-           size: 5
+           size: 4
          },
           title: {
-            text: 'Gastos admon y ventas',
+            text: 'Evolución Ingresos vs Gastos',
             //offsetX: 110
           },
           xaxis: {
             categories: labels,
-          },
-          yaxis: [
-            {
-             min: 0,
-             max: 800000000,
-             forceNiceScale: true,
-              seriesName: 'ventas',
-              labels: {
-                show: false,
-              },
-              title: {
-                text: '',
-              },
-            },
-            {
-             min: 0,
-             max: 800000000,
-             forceNiceScale: true,
-              seriesName: 'Gastos administracion',
-              labels: {
-                show: false,
-              },
-              opposite: true,
-              axisTicks: {
-                show: false,
-              },
-            },
-   
-            {
-             min: 0,
-             max: 800000000,
-             forceNiceScale: true,
-             seriesName: 'Gastos ventas',
-             labels: {
-               show: false,
-             },
-             opposite: true,
-             axisTicks: {
-               show: false,
-             },
-           },
-           {
-           
-             seriesName: 'Revenue',
-             labels: {
-               show: false,
-             },
-             opposite: true,
-             title: {
-               text: '',
-             },
-           },
          
-           
-          ],
+          },
+          yaxis:[
+       
+            {
+          
+            forceNiceScale:true,
+            min:0,
+            max:max_saldo,
+            opposite:false,
+            labels: {
+              show: false,
+            },
+            title: {
+              text: '',
+            },
+          
+          }, 
+           {
+            forceNiceScale:true,
+            min:0,
+            max:max_saldo,
+            opposite:false,
+            labels: {
+              show: false,
+            },
+            title: {
+              text: ''
+            }
+          },
+          {
+            forceNiceScale:true,
+            min:0,
+            max:max_saldo,
+            opposite:false,
+            labels: {
+              show: false,
+            },
+            title: {
+              text: ''
+            }
+          },
+
+
+          {
+            forceNiceScale:true,
+            opposite:true,
+            labels: {
+              show: false,
+            },
+            title: {
+              text: ''
+            }
+          }
+       
+            ] ,
           tooltip: {
             shared: false,
             intersect: true,
@@ -2035,32 +2288,43 @@ plotOptions: {
             y: [{
               formatter: function (y) {
                 if(typeof y !== "undefined") {
-                  return  y.toFixed(0) + "$";
+                  y=toMoney(y)
+                  return  y;
                 }
-                return y;
                 
               }
             }, {
               formatter: function (y) {
                 if(typeof y !== "undefined") {
-                  return  y.toFixed(2) + "$";
+                  y=toMoney(y)
+                  return  y;
                 }
-                return y;
                 
               }},
               {
                 formatter: function (y) {
                   if(typeof y !== "undefined") {
-                    return  y.toFixed(4) + "%";
+                    y=toMoney(y)
+                    return  y;
                   }
-                  return y;
                   
                 }
-            }]
+            },
+            {
+              formatter: function (y) {
+                if(typeof y !== "undefined") {
+                
+                  return  y.toFixed(0)+"%";
+                }
+                
+              }}         
+          ]
           },
           legend: {
-            horizontalAlign: 'left',
-            offsetX: 40
+            show: true,
+        enabled:true,
+        horizontalAlign: 'center',
+        floating: false,
           }
           }    
       
@@ -2132,7 +2396,7 @@ plotOptions: {
                 curve: 'smooth'
               },
               title: {
-                text: 'Márgenes',
+                text: 'Márgenes de Rentabilidad Operacional',
                 align: 'left'
               },
               grid: {
@@ -2181,11 +2445,7 @@ plotOptions: {
           
               legend: {
                 enabled:true,
-                position: 'top',
-                horizontalAlign: 'right',
-                floating: true,
-                offsetY: -25,
-                offsetX: -5
+              
               }
               
               },
@@ -2463,7 +2723,6 @@ plotOptions: {
          </Paper>
        </Fade>
       ) : (
-        <Box>
         <Grid container spacing={{ xs: 0, md: -4 }}>
 
           {/*
@@ -2501,32 +2760,49 @@ plotOptions: {
           </Grid>
 
           */}
-     <Grid  >
-       <Paper sx={{ p: 1 }} >
+             <Grid sx={{mx: 0  }}  style={{width:'35%'}}>
+            <Paper sx={{ p: 1 }}>
+              <Typography variant="subtitle1"></Typography>
+              <Chart options={chartCrecimiento
+              .options} series={chartCrecimiento.series} type="line" 
+              height="132%"
+              />
+
+            </Paper>
+            </Grid>
+
+    
+
+    
+            <Grid sx={{mx: 1  }}  style={{width:'30%'}}>
+            <Paper sx={{ p: 0 }} >
+              <Typography variant="subtitle1"></Typography>
+              <Chart options={ejemplolinea.options} series={ejemplolinea.series} type="line"  height="142%"/>
+
+            </Paper>
+            </Grid>
+
+            <Grid sx={{mx: 1 }}  style={{width:'30%'}}>
+            <Paper sx={{ p: 0 }}>
+              <Typography variant="subtitle1"></Typography>
+              <Chart options={chartRoaRoe.options} series={chartRoaRoe.series} type="bar" 
+              height="295%"
+              />
+
+            </Paper>
+            </Grid>
+
+{/*
+            
+     <Grid  sx={{mx: 0  }} style={{width:'28%'}}>
+       <Paper sx={{ p: 0 }} >
               <Typography variant="subtitle1"></Typography>
          
-         <Chart options={ejemploRadial.options} series={ejemploRadial.series} type="radialBar"  height={215} width="280" />
+         <Chart options={ejemploRadial.options} series={ejemploRadial.series} type="radialBar"  height="142%"  />
        </Paper>
        </Grid>
 
-       <Grid sx={{mx: 1  }}>
-            <Paper sx={{ p: 1 }}>
-              <Typography variant="subtitle1"></Typography>
-              <Chart options={chartCrecimiento.options} series={chartCrecimiento.series} type="line"  height={200} width="450" />
-
-            </Paper>
-            </Grid>
-
-            <Grid sx={{mx: 0  }}>
-            <Paper sx={{ p: 1 }} >
-              <Typography variant="subtitle1"></Typography>
-              <Chart options={ejemplolinea.options} series={ejemplolinea.series} type="line"  height={200} width="450" />
-
-            </Paper>
-            </Grid>
-         
-
-
+*/}
       
        {/*
             <Grid  sx={{ mx: -4, my: -4 }}>
@@ -2559,26 +2835,34 @@ plotOptions: {
 
             </Paper>
           </Grid>*/}
-
+{/*
 <Grid >
        <Paper sx={{ p: 1 }} >
               <Typography variant="subtitle1"></Typography>
          
          <Chart options={ejemploRadial2.options} series={ejemploRadial2.series} type="radialBar"  height={215} width="280" />
        </Paper>
-       </Grid>
+       </Grid> */}
 
-
-            <Grid sx={{mx: 1  }}>
+       <Grid sx={{mx: 0, my: -29  }} style={{width:'35%'}}>
             <Paper sx={{ p: 1 }} >
               <Typography variant="subtitle1"></Typography>
-              <Chart options={lineaMargen.options} series={lineaMargen.series} type="line"  height={200} width="450" />
+              <Chart options={ejemplolinea2.options} series={ejemplolinea2.series} type="line"  height="142%"  />
 
             </Paper>
             </Grid>
 
 
-       
+            <Grid sx={{mx: 1  ,my: -29  }} style={{width:'30%'}}>
+            <Paper sx={{ p: 0 }} >
+              <Typography variant="subtitle1"></Typography>
+              <Chart options={lineaMargen.options} series={lineaMargen.series} type="line"  height="152%"  />
+
+            </Paper>
+            </Grid>
+
+
+        
 
        
 {/*
@@ -2692,17 +2976,10 @@ plotOptions: {
 
 
 
-            <Grid sx={{mx: 0  }}>
-            <Paper sx={{ p: 1 }} >
-              <Typography variant="subtitle1"></Typography>
-              <Chart options={ejemplolinea2.options} series={ejemplolinea2.series} type="line"  height={200} width="450" />
-
-            </Paper>
-            </Grid>
+           
 
     
           </Grid> 
-          </Box>
         
       )}
     </Stack>

@@ -29,6 +29,13 @@ import { ReactComponent as LogoFull } from "../../assets/logo/templogo2.svg";
 import "./Sidebar.css";
 
 import { logoutUser } from "../../actions/authActions";
+import {
+  AppBar,
+  styled,
+  Button,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -102,12 +109,24 @@ const Sidebar = () => {
     // "Billing",
     // "Support",
   ];
+  const Box1 = styled(AppBar)(() => ({
+    boxShadow: "none",
+    background: "#0094b6",
+    backgroundImage: 'url("http://localhost:3000/INLAZU.png")',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backdropFilter: "blur(4px)",
+    width: "100%",
+  }));
 
   return (
     <>
+   
       <Box
         className="sidebar"
-        bgcolor="#0094b6"
+        //bgcolor="#0094b6"
+        sx={{backgroundImage:'url(http://localhost:3000/Banner_claro.png)'}}
         boxShadow="1px 0px 2px grey"
         position="fixed"
         overflow="auto"
@@ -122,6 +141,15 @@ const Sidebar = () => {
         >
           <LogoFull height={20} style={{ marginTop: "20px" }} />
           <List sx={{ pt: 3, color: "white" }}>
+
+          <ListItemButton component={Link} to="/addtrades/api_sync">
+              <ListItemIcon>
+                <SyncIcon sx={{ color: "white" }} />
+              </ListItemIcon>
+              <ListItemText primary="Synchronization" sx={{ color: "white", ml: -2 }} />
+            </ListItemButton>
+
+
             <ListItemButton component={Link} to="/tradestable">
               <ListItemIcon>
                 <DashboardIcon sx={{ color: "white" }} />
@@ -131,21 +159,15 @@ const Sidebar = () => {
                 sx={{ color: "white", ml: -2 }}
               />
             </ListItemButton>
-
+{/*
             <ListItemButton component={Link} to="/dashboard">
               <ListItemIcon>
                 <TableViewIcon sx={{ color: "white" }} />
               </ListItemIcon>
               <ListItemText primary="Reports" sx={{ color: "white", ml: -2 }} />
             </ListItemButton>
-
-            <ListItemButton component={Link} to="/addtrades/api_sync">
-              <ListItemIcon>
-                <SyncIcon sx={{ color: "white" }} />
-              </ListItemIcon>
-              <ListItemText primary="Synchronization" sx={{ color: "white", ml: -2 }} />
-            </ListItemButton>
-
+*/}
+           
             {/* <ListItemButton
               onClick={() => {
                 setOpen({

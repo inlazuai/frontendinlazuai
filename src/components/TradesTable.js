@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
 import axios from "axios";
-
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -52,6 +52,7 @@ export default function TradesTable() {
   const [brokerFilters, setBrokerFilters] = useState([]);
   const [symbolFilters, setSymbolFilters] = useState([]);
   const [statusFilters, setStatusFilters] = useState([]);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClose = () => {
     setAnchorEl(null);
@@ -115,13 +116,17 @@ export default function TradesTable() {
   }, [filters, trades]);
 
   const [reportShow, setReportShow] = useState(false);
+  const [filtroCheck, setfiltroCheck] = useState();
+
   const [selectedTrades, setSelectedTrades] = useState([]);
   const resetFilters = () => {
   setFilters({ ...filters, brokers: []});
   };
 
+ 
+
   return (
-    <MainLayout title="Inlazu reports">
+    <MainLayout title="">
       {trades.loading ? (
         <Stack
           height="calc(100vh - 135px)"
@@ -131,13 +136,17 @@ export default function TradesTable() {
           <Spinner />
         </Stack>
       ) : (
+        
         <Stack width="100%" p={{ xs: 1, md: 2 }} spacing={3}>
           <Card>
             <Box p={1.5}>
-              <Typography component="span" m={0.5}>
+            <Typography component="span" m={0.5}>
                 <b>Filters:</b>
               </Typography>
+            <Button style={{color:'#80448C'}} variant="outlined" size="small" onClick={resetFilters}>Anual</Button>
+           
               <Button
+                style={{color:'#80448C'}}
                 variant="outlined"
                 endIcon={<ExpandMoreIcon />}
                 size="small"
@@ -150,9 +159,10 @@ export default function TradesTable() {
                 mensual
               </Button>
          
+         
              {
              
-             <Button onClick={resetFilters}>Reset Filters</Button>
+          
              /*
                <Button
                 variant="outlined"
@@ -192,6 +202,8 @@ export default function TradesTable() {
                 clear filters
               </Button>
                */}
+
+               
               <Popover
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
@@ -206,12 +218,27 @@ export default function TradesTable() {
                 }}
               >
                 <Stack p={1} width={185} maxHeight={500}>
-                  {selectedFilter === "broker"
+              
+                  {
+                  
+                  
+                
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  selectedFilter === "broker"
                     ? brokerFilters.map((broker, index) => (
                         <FormControlLabel
                           key={index}
                           control={
                             <Checkbox
+                              style={{color:'#80448C'}}
                               checked={filters.brokers.includes(broker)}
                               size="small"
                               onChange={() => {
@@ -225,6 +252,7 @@ export default function TradesTable() {
                               }}
                             />
                           }
+
                           label={
                             <Typography
                               variant="body2"
@@ -239,8 +267,12 @@ export default function TradesTable() {
                               {broker.split(" ")[1]}
                             </Typography>
                           }
+
+                       
                         />
+                       
                       ))
+                     
                     : selectedFilter === "symbol"
                     ? filters.brokers.length === 0
                       ? uniq(extract(symbolFilters)).map((symbol, index) => (
@@ -351,6 +383,7 @@ export default function TradesTable() {
                           }
                         />
                       ))}
+                       
                 </Stack>
               </Popover>
             </Box>
