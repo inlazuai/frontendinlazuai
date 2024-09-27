@@ -400,6 +400,7 @@ export default function BrokerSync() {
                   variant: "success",
                 }
               );
+              navigate("/tradestable");
             {/*
               setMessage("Getting reports...");
               const response = await axios.post("/api/import_reports_siigo", {
@@ -463,7 +464,7 @@ export default function BrokerSync() {
   );
 
   return (
-    <MainLayout title="Api Synchronization">
+    <MainLayout title="">
       <Stack width="100%" p={{ xs: 1, md: 2 }}>
         {loading ? (
           <Stack
@@ -535,6 +536,7 @@ export default function BrokerSync() {
                   variant: "success",
                 }
               );
+              navigate("/tradestable");
             {/*
               setMessage("Getting reports...");
               const response = await axios.post("/api/import_reports_siigo", {

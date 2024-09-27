@@ -12,7 +12,7 @@ import {
 import BuyIcon from "@mui/icons-material/ShoppingCart";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import { ReactComponent as LogoFull } from "../../assets/logo/templogoshort.svg";
+import { ReactComponent as LogoFull } from "../../assets/logo/INLAZUAI_ok.svg";
 
 import { logoutUser } from "../../actions/authActions";
 
@@ -21,7 +21,7 @@ export default function AppbarAuth(props) {
   const navigate = useNavigate();
   const AppBarStyled = styled(AppBar)(() => ({
     boxShadow: "none",
-    background: "#0094b6",
+    backgroundImage: 'url("http://localhost:3000/banner_end.png")',
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -32,7 +32,8 @@ export default function AppbarAuth(props) {
   return (
     <AppBarStyled position="fixed" color="default">
       <Toolbar sx={{ width: "100%" }}>
-        <LogoFull height={25} style={{ marginLeft: "12px" }} />
+       {/* <LogoFull height={30} style={{ marginLeft: "-640px" }} />*/}
+       <LogoFull height={50} width={160} style={{ marginLeft: "12px" }} />
         <Typography
           variant="h6"
           color="white"
@@ -46,6 +47,7 @@ export default function AppbarAuth(props) {
         {/* <Typography variant="h6" mr={1} display={{ xs: "none", lg: "inherit" }}>
           <b>2 days </b> remaining before expiration
         </Typography> */}
+        {/*
         <Button
           variant="outlined"
           color="secondary"
@@ -61,7 +63,9 @@ export default function AppbarAuth(props) {
         >
           Buy Now
         </Button>
+        */}
         <Button
+         style={{color:'#FFFFFF'}}
           variant="outlined"
           color="warning"
           endIcon={<LogoutIcon />}
@@ -69,14 +73,16 @@ export default function AppbarAuth(props) {
             dispatch(logoutUser());
           }}
           sx={{
-            bgcolor: "#0094b6",
-            color: "white",
-            borderColor: "white",
+            bgcolor: "",
+            color: "blue",
+            borderColor: "#FFFFFF",
             borderWidth: 1,
             mr: 2,
           }}
         >
-          logout
+      <Typography fontWeight={'bold'} variant='button' color="#FFFFFF">
+        logout
+      </Typography>
         </Button>
       </Toolbar>
     </AppBarStyled>

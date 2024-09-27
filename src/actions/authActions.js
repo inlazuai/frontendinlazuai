@@ -18,7 +18,7 @@ export const registerUser =
         setAuthToken(token);
         const decoded = jwt_decode(token);
         dispatch(setCurrentUser(decoded));
-        navigate("/tradestable");
+        navigate("/addtrades/api_sync");
       })
       .catch((err) =>
         dispatch({ type: GET_ERRORS, payload: err.response.data })
@@ -40,7 +40,7 @@ export const loginUser =
         enqueueSnackbar("You have logged in successfully", {
           variant: "success",
         });
-        navigate("/tradestable");
+        navigate("/addtrades/api_sync");
       })
       .catch((err) => {
         dispatch({

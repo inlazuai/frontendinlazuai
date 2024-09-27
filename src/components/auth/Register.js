@@ -15,6 +15,7 @@ import {
 // components
 import PageContainer from "../container/PageContainer";
 import Logo from "../../layouts/full/shared/logo/Logo";
+
 import isEmpty from "../../validation/isEmpty";
 
 import { registerUser } from "../../actions/authActions";
@@ -131,16 +132,11 @@ const Register = () => {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Logo />
+               
+
+                <Logo/>
               </Box>
-              <Typography
-                variant="subtitle1"
-                textAlign="center"
-                color="textSecondary"
-                mb={2}
-              >
-                Your Social Campaigns
-              </Typography>
+            
               <Stack direction="column" spacing={2}>
                 <Stack direction="row" spacing={1}>
                   <TextField
